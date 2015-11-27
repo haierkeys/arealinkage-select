@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="jquery.js"></script>
+
+<link href="common.css" rel="stylesheet"/>
+<title>通用JavaScript联动下拉菜单</title>
+</head>
+
+<body>
+
+
+<select class="userinfo_province" name="userinfo[province]" style="width:120px;"></select>
+<select class="userinfo_city" name="userinfo[city]" style="width:120px;"></select>
+<select class="userinfo_district" name="userinfo[district]" style="width:120px;"></select>
+
+<script type="text/javascript" src="LinkageSelect.js"></script>
+<script type="text/javascript" src="location.js"></script>
+<script type="text/javascript">
+jQuery(function() {
+	var options	= {
+		data	: data
+	}
+	var sel = new LinkageSelect(options);
+	sel.bind('.userinfo_province',44);
+	sel.bind('.userinfo_city',45);
+	sel.bind('.userinfo_district',46);
+
+	var last=JSON.stringify(data); 
+	$('div').html(last);
+
+})
+</script>
+<div></div>
+
+</body>
+</html>
