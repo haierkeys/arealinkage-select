@@ -15,17 +15,18 @@
 <select class="userinfo_city" name="userinfo[city]" style="width:120px;"></select>
 <select class="userinfo_district" name="userinfo[district]" style="width:120px;"></select>
 
-<script type="text/javascript" src="LinkageSelect.js"></script>
-<script type="text/javascript" src="location.js"></script>
+<script type="text/javascript" src="LinkageSelectNew.js"></script>
+<script type="text/javascript" src="data.js"></script>
 <script type="text/javascript">
 jQuery(function() {
 	var options	= {
-		data	: data
+		data	: data,
+		province : '.userinfo_province',
+		city : '.userinfo_city',
+		district : '.userinfo_district'
 	}
-	var sel = new LinkageSelect(options);
-	sel.bind('.userinfo_province',44);
-	sel.bind('.userinfo_city',45);
-	sel.bind('.userinfo_district',46);
+	var LSelect = new LinkageSelect(options);
+
 
 
 

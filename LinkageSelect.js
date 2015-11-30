@@ -129,6 +129,7 @@ function LinkageSelect(options) {
 		element.show();
 		var index	= 1;
 		var selected_index	= 0;
+		console.log(json);
 		for(var opt_value in json) {
 			var opt_title	= json[opt_value];
 			var selected	= '';
