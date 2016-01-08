@@ -38,10 +38,8 @@ function LinkageSelect(options) {
 					opt_value	= opt2['id'];
 					opt_selected = city == opt_value?'selected="selected"':''
 					city_options += '<option value="' + opt_value + '" ' + opt_selected + '>' + opt_title + '</option>';
-
 					if (city == opt_value) {
 						for(var key3 in opt2['child']) {
-
 							opt3 = opt2['child'][key3];
 							opt_title	= opt3['name'];
 							opt_value	= opt3['id'];
