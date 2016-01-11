@@ -1,217 +1,68 @@
-/**
- * jQuery多级联动菜单
- * 
- * Author:	ZhouFan <happyeddie@gmail.com>
- * 
- */
+
 
 function LinkageSelect(options) {
-
 	$ = jQuery;
-	
-	var bindEls	= new Array();
-	var items	= {};
-	
 	// 默认参数
 	var settings = {
 		data		: {},
-		file		: null,
-		root		: '0',
-		ajax		: null,
-		timeout		: 30,
-		method		: 'post',
-		field_name	: null,
-		auto		: false
+		province	: '',
+		city		: '',
+		district 	: '',
+		provinceset	: '',
+		cityset		: '',
+		districtset : ''
 	}; 
 	
 	// 自定义参数
 	if(options) {  
 		jQuery.extend(settings, options); 
 	}
-	
-	items	= settings.data;
-	
-	/**
-	 * 绑定元素
-	 * @param {Object} element
-	 * @param {Object} value
-	 */
-	function _bind(element , value) {
-		
-		// 对象关联的key
-		var key	= bindEls.length ?
-			bindEls[bindEls.length - 1].key + ',' + bindEls[bindEls.length - 1].value :
-			settings.root;
-		
-		// 将绑定的元素放入数组
-		bindEls.push({
-			element	: element,
-			key		: key,
-			value	: value
-		});
-		
-		var item_count	= 0;
-		for (var i in items) {
-			item_count++;
-		}
-		
-		// 查找自身id
-		for (var el_id in bindEls) {
-			if (bindEls[el_id].element == element) {
-				var self_id	= parseInt(el_id);
-			}
-		}
-		
-		for(var el_id in bindEls){
-			// 为所有前面的对象增加onchange事件，onchange时，清空自身
-			if (el_id < self_id){
-				bindEls[el_id].element.change(function() {
-					_fill(element);
-				})
-			}
-		}
-		
-		// 为上一级对象增加onchange事件，以刷新自身列表
-		if (self_id > 0) {
-			bindEls[self_id-1].element.change(function() {
-				_fill(element , bindEls[self_id].key);
-			});
-		}
-		
-		element.change(function() {
-			var self_key			= bindEls[self_id-1]?bindEls[self_id].key + ',' + $(this).val():'0,' + $(this).val();
-			if (typeof bindEls[self_id+1] != 'undefined') {
-				bindEls[self_id+1].key	= self_key;
-			}
-			
-			// 自动填入所选值
-			if (settings.field_name) {
-				$(settings.field_name).val($(this).val());
-			}
-			
-			if (settings.auto) {
-				if (typeof bindEls[self_id+1] == 'undefined') {
-					_find(self_key , function(key , json) {
-						if (json) {
-							var el	= $('<select></select>');
-							element.after(el);
-							_bind(el , '');
-							_fill(bindEls[self_id+1].element , key , json);
+
+	function build(province,city,district){
+		var province_options = '<option value="0">省份/自治区</option>';
+		var city_options = '<option value="0">城市/地区</option>';
+		var district_options = '<option value="0">区/县</option>';
+		var opt,opt_title,opt_value,opt_selected;
+		for(var key1 in settings.data) {
+			opt1 = settings.data[key1];
+			opt_title	= opt1['name'];
+			opt_value	= opt1['id'];
+			opt_selected = province == opt_value?'selected="selected"':''
+			province_options += '<option value="' + opt_value + '" ' + opt_selected + '>' + opt_title + '</option>';
+
+			if (province == opt_value) {
+				for(var key2 in opt1['child']) {
+
+					opt2 = opt1['child'][key2];
+					opt_title	= opt2['name'];
+					opt_value	= opt2['id'];
+					opt_selected = city == opt_value?'selected="selected"':''
+					city_options += '<option value="' + opt_value + '" ' + opt_selected + '>' + opt_title + '</option>';
+					if (city == opt_value) {
+						for(var key3 in opt2['child']) {
+							opt3 = opt2['child'][key3];
+							opt_title	= opt3['name'];
+							opt_value	= opt3['id'];
+							opt_selected = district == opt_value?'selected="selected"':''
+							district_options += '<option value="' + opt_value + '" ' + opt_selected + '>' + opt_title + '</option>';
 						}
-					});
+					};
 				}
-			}
-		})
-		_fill(element , key , value);
-		
+			};
+		}
+		$(settings.province).html(province_options)
+		$(settings.city).html(city_options);
+		$(settings.district).html(district_options);
 	}
 	
-	/**
-	 * 填充option
-	 * @param {Object} element
-	 * @param {Object} key
-	 * @param {Object} value
-	 */
-	function _fill(element , key , value) {
+	function _init() {
 		
-		element.empty();
-		element.append('<option value="">请选择</option>');
-		
-		var json	= _find(key , function() {
-			_fill(element , key , value);
+		$(settings.province+', '+settings.city).change(function(){
+			province = $(settings.province).find("option:selected").val();
+			city = $(settings.city).find("option:selected").val();
+			build(province,city);
 		});
-		
-		if (!json) {
-			if (settings.auto)
-				element.hide();
-			return false;
-		}
-		element.show();
-		var index	= 1;
-		var selected_index	= 0;
-		console.log(json);
-		for(var opt_value in json) {
-			var opt_title	= json[opt_value];
-			var selected	= '';
-			if (opt_value == value) {
-				selected_index	= index;
-				selected		= 'selected="selected"';
-			}
-			var option	= $('<option value="' + opt_value + '" ' + selected + '>' + opt_title + '</option>');
-			element.append(option);
-			index++;
-		}
-		
-		if (element[0]) {
-			//IE6
-			setTimeout(function(){
-				element[0].options[selected_index].selected = true;
-			}, 0);
-			// 让FF选中默认项
-			element[0].selectedIndex	= 0;
-			element.attr('selectedIndex' , selected_index);
-		}
-		element.width(element.width());
+		build(settings.provinceset,settings.cityset,settings.districtset);
 	}
-	
-	/**
-	 * 查找元素
-	 * @param {Object} key
-	 */
-	function _find(key , callback) {
-		if (typeof key == 'undefined') {	// 若未定义key
-			return null;
-		} else if (key[key.length-1] == ',') {	// 若key以','结尾，肯定是取不到值
-			return null
-		} else if(typeof(items[key]) == "undefined") {
-			
-			// 计算items元素个数
-			var item_count	= 0;
-			for (var i in items) {
-				item_count++;
-				break;
-			}
-			
-			if (settings.ajax) {
-				$.getJSON(settings.ajax , {key:key} , function(json) {
-					items[key] = json;
-					callback(key , json);
-				})
-			} else if(settings.file && item_count == 0) {
-				$.getJSON(settings.file , function(json) {
-					items = json;
-					callback(key , json);
-				})
-			}
-		}
-			
-		return items[key];
-	}
-	
-	/**
-	 * 获取对象
-	 * @param {Object} element
-	 */
-	function _getEl(element) {
-		if (typeof element == 'string') {
-			return $(element);
-		} else {
-			return element;
-		}
-	}
-	
-	
-	return {
-		
-		// 绑定元素
-		bind	: function(element , value) {
-			if (typeof element != 'object')
-				element	= _getEl(element);
-			value	= value?value:'';
-			
-			_bind(element , value);
-			
-		}
-	}
-	
+	_init();
 }
