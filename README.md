@@ -1,5 +1,9 @@
 # arealinkage-select
-中国行政区省市区三级联动,JS &amp; PHP调用 以及最新数据采集  China's administrative provinces, three-level linkage 
+
+ -基于JQuery 的 中国行政区省市区地区三级联动菜单
+- 已经写好了PHP采集页面,可以自动从政府官网采集地区数据
+- 地区也可以通过 php来调用
+
 
 
 js调用方法
