@@ -1,8 +1,9 @@
 # arealinkage-select
 
- -基于JQuery 的 中国行政区省市区地区三级联动菜单
-- 已经写好了PHP采集页面,可以自动从政府官网采集地区数据
-- 地区也可以通过 php来调用
+- 中国行政区 省/市/县区/乡镇 四级地区联动选择, 实现Javascript 动态选择
+- 支持直接PHP 拿出地址数据 
+- 支持PHP CLI 采集最新的数据 采集方法 命令行 php -f collectdata.php
+
 
 
 
